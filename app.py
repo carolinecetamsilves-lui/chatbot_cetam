@@ -3,11 +3,12 @@ import sqlite3
 
 app = Flask(__name__)
 
-
+# ✅ Rota principal para exibir o HTML (chatbot)
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
-# Rota para listar apenas os nomes dos cursos (usado no frontend para exibir botões de cursos)
+
+# ✅ Rota para listar apenas os nomes dos cursos (usado no frontend para exibir botões de cursos)
 @app.route('/cursos')
 def listar_cursos():
     conn = sqlite3.connect('cursos.db')
@@ -17,13 +18,12 @@ def listar_cursos():
     conn.close()
     return jsonify({'cursos': cursos})
 
-# Rota para buscar informações completas de um curso pelo nome
+# ✅ Rota para buscar informações completas de um curso pelo nome
 @app.route('/curso_info')
 def curso_info():
     nome = request.args.get('nome')
     conn = sqlite3.connect('cursos.db')
     cursor = conn.cursor()
-    # Seleciona todas as informações de um curso pelo nome
     cursor.execute('''
         SELECT nome, local, data_inicio, data_termino, horario, carga_horaria, inscricao 
         FROM cursos 
@@ -47,12 +47,7 @@ def curso_info():
     else:
         return jsonify({'success': False, 'message': 'Curso não encontrado'})
 
-# Rota principal para exibir o HTML (chatbot)
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-# Rota para responder as mensagens do chatbot
+# ✅ Rota para responder as mensagens do chatbot
 @app.route('/responder', methods=['POST'])
 def responder():
     user_message = request.json['message'].lower()
@@ -71,7 +66,6 @@ def responder():
         else:
             resposta = "❗️ Não há cursos cadastrados no momento."
 
-#Rota de respostas para as informações 
     elif "inscrição" in user_message or "período" in user_message:
         resposta = "📅 As inscrições estão abertas até 30/07/2025."
 
@@ -116,5 +110,7 @@ def responder():
 
     return jsonify({'response': resposta})
 
+# ✅ Início do servidor
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    from os import environ
+    app.run(host='0.0.0.0', port=int(environ.get("PORT", 5000)))
