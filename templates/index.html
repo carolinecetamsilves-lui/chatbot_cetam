@@ -4,26 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot CETAM</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-
-    <h1>Bem-vindo ao Chatbot CETAM</h1>
-
-    <div id="chat">
-        <div id="messages"></div>
-    </div>
-
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
-
-
-        
+    
+    <!-- CSS embutido -->
+    <style>
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #d5d6df, #05186b);
             color: #fff;
+            margin: 0;
+            padding: 0;
+            text-align: center;
         }
 
         #chat {
@@ -38,7 +28,6 @@
 
         .message {
             margin: 10px 0;
-            text-align: left;
         }
 
         .user {
@@ -56,7 +45,7 @@
             padding: 8px;
             border: none;
             border-radius: 5px;
-            background: #0924bd;
+            background: #0924ab;
             color: white;
             cursor: pointer;
             transition: background 0.3s;
@@ -76,128 +65,122 @@
 </head>
 <body>
 
-<div id="chat">
-    <div id="messages"></div>
-</div>
+    <h1>Bem-vindo ao Chatbot CETAM</h1>
 
-<script>
-    // Função para exibir mensagem (limpa o conteúdo anterior)
-    function appendMessage(content, type = 'bot') {
-        const messages = document.getElementById('messages');
-        messages.innerHTML = '';  // 🔥 Sempre limpa antes de mostrar nova mensagem
-        const div = document.createElement('div');
-        div.className = `message ${type}`;
-        div.innerHTML = content;
-        messages.appendChild(div);
-    }
+    <div id="chat">
+        <div id="messages"></div>
+    </div>
 
-    // Função para exibir o menu principal
-    function showMenu() {
-        const messages = document.getElementById('messages');
-        messages.innerHTML = '';  // 🔥 Limpa tudo antes de exibir o menu
-
-        messages.innerHTML = `
-            <img src="/static/personagem.png" alt="Luí - Assistente Virtual" class="personagem">
-            <div class="message bot">
-                Olá! Sou o Luí, Assistente Virtual do CETAM.<br>Escolha uma opção:
-            </div>
-            <button onclick="getCourses()">📋 Cursos</button>
-            <button onclick="sendMessage('Acesse o Edital')">💻 Edital</button>
-            <button onclick="sendMessage('Tenho dúvidas sobre cadastro')">ℹ️ Cadastro</button>
-            <button onclick="sendMessage('Portal do candidato')">👩‍🎓 Portal</button>
-            <button onclick="sendMessage('Quero falar com a secretaria')">📞 Secretaria</button>
-            <button onclick="sendMessage('Como emitir segunda via do certificado?')">🗂 2ª Via</button>
-            <button onclick="sendMessage('Quero fazer um agendamento de visita')">📆 Agendamento</button>
-        `;
-    }
-
-    // Função para buscar os cursos
-    function getCourses() {
-        const messages = document.getElementById('messages');
-        messages.innerHTML = '📋 Buscando cursos disponíveis...';
-
-        fetch('/cursos')
-        .then(response => response.json())
-        .then(data => {
-            let html = '<div class="message bot">📋 Cursos Disponíveis:</div>';
-            data.cursos.forEach(curso => {
-                html += `<button onclick="showCourseInfo('${curso.nome}')">${curso.nome}</button>`;
-            });
-            html += `<br><button onclick="showMenu()">🔙 Voltar ao Menu</button>`;
-            messages.innerHTML = html;
-        });
-    }
-
-    // Função para mostrar as informações detalhadas do curso
-    function showCourseInfo(cursoNome) {
-        const messages = document.getElementById('messages');
-        messages.innerHTML = `Você escolheu: <strong>${cursoNome}</strong>`;
-
-        fetch(`/curso_info?nome=${encodeURIComponent(cursoNome)}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const curso = data.curso;
-                messages.innerHTML = `
-                    <div class="message bot">
-                        <strong>📚 Curso:</strong> ${curso.nome}<br>
-                        <strong>📍 Local:</strong> ${curso.local}<br>
-                        <strong>📅 Início:</strong> ${curso.data_inicio}<br>
-                        <strong>📅 Término:</strong> ${curso.data_termino}<br>
-                        <strong>⏰ Horário:</strong> ${curso.horario}<br>
-                        <strong>⏳ Carga Horária:</strong> ${curso.carga_horaria}<br>
-                        <strong>📝 Inscrição:</strong> ${curso.inscricao}<br><br>
-                        <button onclick="showMenu()">🔙 Voltar ao Menu</button>
-                    </div>
-                `;
-            } else {
-                messages.innerHTML = `❗ Curso não encontrado.<br><button onclick="showMenu()">🔙 Voltar ao Menu</button>`;
-            }
-        });
-    }
-
-    // Função para enviar mensagens ao backend e exibir resposta
-    function sendMessage(text) {
-        const messages = document.getElementById('messages');
-        messages.innerHTML = `<div class="message user">${text}</div>`;
-
-        fetch('/responder', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text })
-        })
-        .then(response => response.json())
-        .then(data => {
-            messages.innerHTML += `<div class="message bot">${data.response.replace(/\n/g, '<br>')}</div>`;
-            messages.innerHTML += `<button onclick="showMenu()">🔙 Voltar ao Menu</button>`;
-        });
-    }
-
-    // Função para o assistente falar usando SpeechSynthesis
-    function falar(texto) {
-        const sintese = window.speechSynthesis;
-        const voz = new SpeechSynthesisUtterance(texto);
-        const todasAsVozes = sintese.getVoices();
-        const vozBrasileira = todasAsVozes.find(v => v.lang === 'pt-BR' || v.lang === 'pt_BR');
-
-        if (vozBrasileira) {
-            voz.voice = vozBrasileira;
+    <!-- JavaScript embutido -->
+    <script>
+        function appendMessage(content, type = 'bot') {
+            const messages = document.getElementById('messages');
+            messages.innerHTML = '';
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.innerHTML = content;
+            messages.appendChild(div);
         }
 
-        voz.lang = 'pt-BR';
-        voz.rate = 1.2;  // Velocidade ajustável
-        voz.pitch = 1;   // Tom padrão
-        sintese.speak(voz);
-    }
+        function showMenu() {
+            const messages = document.getElementById('messages');
+            messages.innerHTML = `
+                <img src="/static/personagem.png" alt="Luí - Assistente Virtual" class="personagem">
+                <div class="message bot">
+                    Olá! Sou o Luí, Assistente Virtual do CETAM.<br>Escolha uma opção:
+                </div>
+                <button onclick="getCourses()">📋 Cursos</button>
+                <button onclick="sendMessage('Acesse o Edital')">💻 Edital</button>
+                <button onclick="sendMessage('Tenho dúvidas sobre cadastro')">ℹ️ Cadastro</button>
+                <button onclick="sendMessage('Portal do candidato')">👩‍🎓 Portal</button>
+                <button onclick="sendMessage('Quero falar com a secretaria')">📞 Secretaria</button>
+                <button onclick="sendMessage('Como emitir segunda via do certificado?')">🗂 2ª Via</button>
+                <button onclick="sendMessage('Quero fazer um agendamento de visita')">📆 Agendamento</button>
+            `;
+        }
 
-    // Ao carregar a página, mostra o menu e fala
-    window.onload = function() {
-        showMenu();
-        window.speechSynthesis.onvoiceschanged = function() {
-            falar("Olá! Sou o Luí, Assistente Virtual do CETAM. Escolha uma opção.");
+        function getCourses() {
+            const messages = document.getElementById('messages');
+            messages.innerHTML = '📋 Buscando cursos disponíveis...';
+
+            fetch('/cursos')
+            .then(response => response.json())
+            .then(data => {
+                let html = '<div class="message bot">📋 Cursos Disponíveis:</div>';
+                data.cursos.forEach(curso => {
+                    html += `<button onclick="showCourseInfo('${curso.nome}')">${curso.nome}</button>`;
+                });
+                html += `<br><button onclick="showMenu()">🔙 Voltar ao Menu</button>`;
+                messages.innerHTML = html;
+            });
+        }
+
+        function showCourseInfo(cursoNome) {
+            const messages = document.getElementById('messages');
+            messages.innerHTML = `Você escolheu: <strong>${cursoNome}</strong>`;
+
+            fetch(`/curso_info?nome=${encodeURIComponent(cursoNome)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const curso = data.curso;
+                    messages.innerHTML = `
+                        <div class="message bot">
+                            <strong>📚 Curso:</strong> ${curso.nome}<br>
+                            <strong>📍 Local:</strong> ${curso.local}<br>
+                            <strong>📅 Início:</strong> ${curso.data_inicio}<br>
+                            <strong>📅 Término:</strong> ${curso.data_termino}<br>
+                            <strong>⏰ Horário:</strong> ${curso.horario}<br>
+                            <strong>⏳ Carga Horária:</strong> ${curso.carga_horaria}<br>
+                            <strong>📝 Inscrição:</strong> ${curso.inscricao}<br><br>
+                            <button onclick="showMenu()">🔙 Voltar ao Menu</button>
+                        </div>
+                    `;
+                } else {
+                    messages.innerHTML = `❗ Curso não encontrado.<br><button onclick="showMenu()">🔙 Voltar ao Menu</button>`;
+                }
+            });
+        }
+
+        function sendMessage(text) {
+            const messages = document.getElementById('messages');
+            messages.innerHTML = `<div class="message user">${text}</div>`;
+
+            fetch('/responder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            })
+            .then(response => response.json())
+            .then(data => {
+                messages.innerHTML += `<div class="message bot">${data.response.replace(/\n/g, '<br>')}</div>`;
+                messages.innerHTML += `<button onclick="showMenu()">🔙 Voltar ao Menu</button>`;
+            });
+        }
+
+        function falar(texto) {
+            const sintese = window.speechSynthesis;
+            const voz = new SpeechSynthesisUtterance(texto);
+            const todasAsVozes = sintese.getVoices();
+            const vozBrasileira = todasAsVozes.find(v => v.lang === 'pt-BR' || v.lang === 'pt_BR');
+
+            if (vozBrasileira) {
+                voz.voice = vozBrasileira;
+            }
+
+            voz.lang = 'pt-BR';
+            voz.rate = 1.2;
+            voz.pitch = 1;
+            sintese.speak(voz);
+        }
+
+        window.onload = function() {
+            showMenu();
+            window.speechSynthesis.onvoiceschanged = function() {
+                falar("Olá! Sou o Luí, Assistente Virtual do CETAM. Escolha uma opção.");
+            };
         };
-    };
-</script>
+    </script>
 
 </body>
 </html>
